@@ -1,0 +1,19 @@
+{
+    "model_name": "Linear Regression with 7-Day Rolling Average",
+    "features": [
+        "store_location",
+        "hour",
+        "day_of_week",
+        "month",
+        "sales_lag_1d",
+        "sales_lag_7d",
+        "rolling_mean_7d"
+    ],
+    "target": "drinks_sold",
+    "forecast_horizon": "one_day_ahead",
+    "training_period": "2023-01-08 to 2023-05-31",
+    "test_period": "2023-06-01 to 2023-06-30",
+    "test_mae": 10.9,
+    "test_rmse": 14.78,
+    "notes": "Requires actual historical beverage sales; excludes missing-lag observations."
+}
