@@ -1,4 +1,4 @@
-
+import os
 from datetime import date
 
 from fastapi import FastAPI, HTTPException
@@ -13,13 +13,21 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# allow requests from future React frontend
+allowed_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+]
+
+# Public frontend origin, provided during deployment
+frontend_origin = os.getenv("FRONTEND_ORIGIN", "").rstrip("/")
+
+if frontend_origin:
+    allowed_origins.append(frontend_origin)
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173"
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["*"]

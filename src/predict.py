@@ -9,15 +9,26 @@ MODEL_PATH = ROOT / "models" / "cafe_demand_model.joblib"
 DATA_PATH = ROOT / "data" / "processed" / "hourly_sales.csv"
 
 
-def predict_demand(store, date, hour):
-    """Predict next-day hourly beverage sales."""
+from functools import lru_cache
 
-    model = joblib.load(MODEL_PATH)
+@lru_cache(maxsize=1)
+def load_model():
+    return joblib.load(MODEL_PATH)
 
-    history = pd.read_csv(
+
+@lru_cache(maxsize=1)
+def load_history():
+    return pd.read_csv(
         DATA_PATH,
         parse_dates=["transaction_date"]
     )
+
+
+def predict_demand(store, date, hour):
+    """Predict next-day hourly beverage sales."""
+
+    model = load_model()
+    history = load_history()
 
     forecast_date = pd.Timestamp(date)
 

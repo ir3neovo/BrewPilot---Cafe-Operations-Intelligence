@@ -1,0 +1,189 @@
+
+.dashboard {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.dashboard-header {
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  color: #788832;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.dashboard-header h1 {
+  font-size: 36px;
+  margin: 12px 0;
+}
+
+.dashboard-header p,
+.chart-description,
+.helper-text {
+  color: #70786c;
+}
+
+.panel {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 3px 18px rgba(0, 0, 0, 0.04);
+}
+
+.panel h2 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 180px;
+}
+
+.field label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+select,
+.read-only-date {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d8dfd2;
+  border-radius: 8px;
+  background: #fff;
+  color: #253024;
+  font-size: 14px;
+}
+
+.read-only-date {
+  display: flex;
+  align-items: center;
+  background: #f5f6f0;
+}
+
+button {
+  height: 44px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 8px;
+  background: #788832;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #64752a;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #e6ebda;
+  padding: 24px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-card span,
+.stat-card small {
+  color: #626d57;
+  font-size: 13px;
+}
+
+.stat-card strong {
+  font-size: 30px;
+  color: #354529;
+}
+
+.chart-container {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.notice {
+  background: #f7f4eb;
+  padding: 16px;
+  border-radius: 10px;
+  margin-top: 18px;
+}
+
+.notice p {
+  margin: 8px 0;
+}
+
+.notice small {
+  color: #726e60;
+}
+
+.error {
+  color: #a23535;
+  margin-top: 16px;
+}
+
+
+.performance-section {
+  margin-top: 32px;
+}
+
+.model-insight {
+  background: #e6ebda;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.model-insight h3 {
+  margin-top: 0;
+  color: #354529;
+}
+
+.model-insight p {
+  color: #58634e;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+
+@media (max-width: 650px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header h1 {
+    font-size: 28px;
+  }
+
+  .dashboard {
+    padding: 24px 12px;
+  }
+}
