@@ -1,5 +1,5 @@
 
-# ☕ Café Demand Forecasting - BrewPilot
+#BrewPilot
 
 A full-stack machine learning application that predicts hourly beverage sales for coffee shops using historical transaction data.
 
