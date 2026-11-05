@@ -15,5 +15,7 @@
     "test_period": "2023-06-01 to 2023-06-30",
     "test_mae": 10.9,
     "test_rmse": 14.78,
-    "notes": "Requires actual historical beverage sales; excludes missing-lag observations."
+    "notes": "Requires actual historical beverage sales; excludes missing-lag observations.",
+    "serving_max_horizon_days": 30,
+    "serving_strategy": "Recursive forecasts beyond day one; multi-day accuracy has not been evaluated."
 }

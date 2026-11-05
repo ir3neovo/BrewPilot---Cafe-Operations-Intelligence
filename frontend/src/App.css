@@ -187,3 +187,15 @@ button:disabled {
     padding: 24px 12px;
   }
 }
+input[type="date"] {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d8dfd2;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+}
+
+.replay-table-wrapper { overflow-x: auto; }
+.replay-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+.replay-table th, .replay-table td { text-align: left; padding: 12px; border-bottom: 1px solid #d8dfd2; }

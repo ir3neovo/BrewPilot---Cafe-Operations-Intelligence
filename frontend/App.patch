@@ -1,0 +1,149 @@
+diff --git a/frontend/src/App.tsx b/frontend/src/App.tsx
+--- a/frontend/src/App.tsx
++++ b/frontend/src/App.tsx
+@@ -1,2 +1,2 @@
+-import { useState } from "react";
++import { useEffect, useState } from "react";
+ import ModelPerformance from "./ModelPerformance";
+@@ -27,6 +27,14 @@
+   skipped_hours: SkippedHour[];
+ };
++
++type DataStatus = {
++  stores: {
++    name: string;
++    latest_sale_date: string;
++    min_forecast_date: string;
++    max_forecast_date: string;
++  }[];
++};
+ 
+ const API_URL =
+   import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+-const FORECAST_DATE = "2023-07-01";
+@@ -46,9 +54,32 @@
+ function App() {
+   const [store, setStore] = useState("Astoria");
++  const [forecastDate, setForecastDate] = useState("2023-07-01");
++  const [dataStatus, setDataStatus] = useState<DataStatus | null>(null);
++  const [statusError, setStatusError] = useState("");
+ 
+   const [result, setResult] =
+     useState<ForecastResponse | null>(null);
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState("");
++
++  useEffect(() => {
++    fetch(`${API_URL}/data/status`)
++      .then(async (response) => {
++        if (!response.ok) throw new Error("Could not load forecast dates");
++        return (await response.json()) as DataStatus;
++      })
++      .then(setDataStatus)
++      .catch((err) =>
++        setStatusError(err instanceof Error ? err.message : "Unable to load sales status")
++      );
++  }, []);
++
++  const selectedStore = dataStatus?.stores.find((item) => item.name === store);
++  useEffect(() => {
++    if (selectedStore) {
++      setForecastDate(selectedStore.min_forecast_date);
++      setResult(null);
++    }
++  }, [store, dataStatus]);
+ 
+   async function handlePredict() {
+@@ -66,5 +97,5 @@
+           },
+           body: JSON.stringify({
+             store: store,
+-            date: FORECAST_DATE,
++            date: forecastDate,
+           }),
+@@ -114,4 +145,4 @@
+         <span className="eyebrow">
+-          MACHINE LEARNING PROJECT
++          CAFE OPERATIONS INTELLIGENCE
+         </span>
+-        <h1>☕ Café Demand Forecasting</h1>
++        <h1>☕ BrewPilot</h1>
+@@ -142,13 +173,21 @@
+             </select>
+           </div>
+           <div className="field">
+-            <label>Forecast Date</label>
+-            <div className="read-only-date">
+-              July 1, 2023
+-            </div>
++            <label htmlFor="forecast-date">Forecast Date</label>
++            <input
++              id="forecast-date"
++              type="date"
++              value={forecastDate}
++              min={selectedStore?.min_forecast_date}
++              max={selectedStore?.max_forecast_date}
++              onChange={(event) => setForecastDate(event.target.value)}
++              disabled={!selectedStore}
++            />
+           </div>
+ 
+           <button
+             type="button"
+             onClick={handlePredict}
+-            disabled={loading}
++            disabled={loading || !selectedStore || !forecastDate ||
++              forecastDate < selectedStore.min_forecast_date ||
++              forecastDate > selectedStore.max_forecast_date}
+@@ -161,5 +200,8 @@
+         </div>
+         <p className="helper-text">
+-          Historical demonstration: forecasts the day
+-          immediately after the available sales data.
++          {selectedStore
++            ? `Latest recorded sales: ${selectedStore.latest_sale_date}. Forecasts are available from ${selectedStore.min_forecast_date} to ${selectedStore.max_forecast_date}. Predictions beyond the first day are recursive and less certain.`
++            : "Loading available sales dates..."}
+         </p>
++
++        {statusError && <p className="error" role="alert">{statusError}</p>}
+@@ -203,4 +245,4 @@
+             <h2>Hourly Demand Forecast</h2>
+             <p className="chart-description">
+-              {result.store} · July 1, 2023
++              {result.store} · {result.date}
+             </p>
+diff --git a/frontend/src/App.css b/frontend/src/App.css
+--- a/frontend/src/App.css
++++ b/frontend/src/App.css
+@@ -59,6 +59,7 @@
+ }
+ 
+ select,
+-.read-only-date {
++.read-only-date,
++input[type="date"] {
+   height: 44px;
+   padding: 0 12px;
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore
++++ b/.gitignore
+@@ -13,1 +13,4 @@
+ data/raw/
++data/*.db
++data/*.db-*
++data/*.sqlite3
+diff --git a/frontend/src/ModelPerformance.tsx b/frontend/src/ModelPerformance.tsx
+--- a/frontend/src/ModelPerformance.tsx
++++ b/frontend/src/ModelPerformance.tsx
+@@ -29,8 +29,10 @@
+ function ModelPerformance() {
+   return (
+     <section className="panel performance-section">
+-      <h2>Model Performance</h2>
++      <h2>Original Model Benchmark</h2>
+       <p className="chart-description">
+         Final evaluation on 1,060 hourly observations
+         from June 2023.
++        These metrics are historical and do not automatically update
++        after retraining.
+       </p>

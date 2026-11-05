@@ -34,7 +34,7 @@ function ModelPerformance() {
 
       <p className="chart-description">
         Final evaluation on 1,060 hourly observations
-        from June 2023.
+        from June 2023. These one-day results do not measure multi-day forecast accuracy.
       </p>
 
       <div className="chart-container">

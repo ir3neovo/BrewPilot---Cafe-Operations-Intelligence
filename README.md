@@ -63,13 +63,3 @@ The application is deployed on Render using two services:
 - **Backend:** FastAPI web service serving ML predictions
 
 **[View Live Application](https://cafe-demand-dashboard.onrender.com/)**
-
-## Limitations & Future Improvements
-
-The current application demonstrates next-day forecasting for July 1, 2023, using the historical dataset. Hours without sufficient historical data are excluded.
-
-Future improvements include:
-- Integrating regularly updated sales data.
-- Supporting forecasts for additional dates.
-- Generating staffing and inventory recommendations.
-- Improving prediction accuracy during peak hours.

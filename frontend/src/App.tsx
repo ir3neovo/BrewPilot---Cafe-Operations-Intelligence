@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModelPerformance from "./ModelPerformance";
+import ReplayEvaluation from "./ReplayEvaluation";
 import {
   ResponsiveContainer,
   LineChart,
@@ -33,13 +34,9 @@ type ForecastResponse = {
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-const FORECAST_DATE = "2023-07-01";
+type StoreOptions = { store: string; latest_date: string; min_date: string; max_date: string };
 
-const stores = [
-  "Astoria",
-  "Hell's Kitchen",
-  "Lower Manhattan",
-];
+
 
 function formatHour(hour: number): string {
   const suffix = hour >= 12 ? "PM" : "AM";
@@ -48,13 +45,36 @@ function formatHour(hour: number): string {
 }
 
 function App() {
-  const [store, setStore] = useState("Astoria");
+  const [store, setStore] = useState("");
+  const [options, setOptions] = useState<StoreOptions[]>([]);
+  const [forecastDate, setForecastDate] = useState("");
+  const selected = options.find((item) => item.store === store);
+
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    fetch(API_URL + "/forecast/options")
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load available forecast dates.");
+        return response.json();
+      })
+      .then((data: { stores: StoreOptions[] }) => {
+        if (!active) return;
+        if (!data.stores.length) throw new Error("No sales history is available.");
+        setOptions(data.stores);
+        setStore(data.stores[0].store);
+        setForecastDate(data.stores[0].min_date);
+      })
+      .catch((err: Error) => { if (active) setError(err.message); });
+    return () => { active = false; };
+  }, []);
 
   const [result, setResult] =
     useState<ForecastResponse | null>(null);
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
 
   async function handlePredict() {
     setLoading(true);
@@ -71,7 +91,7 @@ function App() {
           },
           body: JSON.stringify({
             store: store,
-            date: FORECAST_DATE,
+            date: forecastDate,
           }),
         }
       );
@@ -131,6 +151,7 @@ function App() {
 
       <section className="panel">
         <h2>Generate a Forecast</h2>
+        <button type="button" disabled={loading} onClick={() => window.location.reload()}>Refresh sales data</button>
 
         <div className="controls">
           <div className="field">
@@ -141,9 +162,14 @@ function App() {
             <select
               id="store"
               value={store}
-              onChange={(e) => setStore(e.target.value)}
+              disabled={loading}
+              onChange={(e) => {
+                setStore(e.target.value);
+                setForecastDate(options.find((item) => item.store === e.target.value)?.min_date || "");
+                setResult(null);
+              }}
             >
-              {stores.map((location) => (
+              {options.map(({ store: location }) => (
                 <option key={location} value={location}>
                   {location}
                 </option>
@@ -152,16 +178,16 @@ function App() {
           </div>
 
           <div className="field">
-            <label>Forecast Date</label>
-            <div className="read-only-date">
-              July 1, 2023
-            </div>
+            <label htmlFor="forecast-date">Forecast Date</label>
+            <input id="forecast-date" type="date" value={forecastDate}
+              min={selected?.min_date} max={selected?.max_date} disabled={loading || !selected}
+              onChange={(e) => { setForecastDate(e.target.value); setResult(null); }} />
           </div>
 
           <button
             type="button"
             onClick={handlePredict}
-            disabled={loading}
+            disabled={loading || !selected || !forecastDate || forecastDate < selected.min_date || forecastDate > selected.max_date}
           >
             {loading
               ? "Predicting..."
@@ -170,8 +196,8 @@ function App() {
         </div>
 
         <p className="helper-text">
-          Historical demonstration: forecasts the day
-          immediately after the available sales data.
+          Sales history through {selected?.latest_date || "loading…"}. Choose up to 30 days ahead.
+          Later dates use earlier predictions; uncertainty increases with the forecast horizon.
         </p>
 
         {error && (
@@ -217,7 +243,7 @@ function App() {
           <section className="panel">
             <h2>Hourly Demand Forecast</h2>
             <p className="chart-description">
-              {result.store} · July 1, 2023
+              {result.store} · {result.date}
             </p>
 
             <div className="chart-container">
@@ -278,6 +304,7 @@ function App() {
           </section>
         </>
       )}
+      <ReplayEvaluation apiUrl={API_URL} />
       <ModelPerformance />
     </main>
   );
